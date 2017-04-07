@@ -1,0 +1,19 @@
+// Extensions for use in directing Thrift schema conversion.
+// TODO: pick extension numbers known to not conflict with common packages.
+// TODO: consider registering these numbers with Google.
+
+syntax = "proto2";
+
+package thrift;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FieldOptions {
+  // The index to use in the generated Thrift schema.
+  optional int32 field_ord = 50000;
+}
+
+extend google.protobuf.OneofOptions {
+  // The index to use in the generated Thrift schema.
+  optional int32 oneof_ord = 50000;
+}
