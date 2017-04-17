@@ -1739,7 +1739,8 @@ func (g *Generator) generateMessage(message *Descriptor) {
 				log.Fatal("user error: you must specify the (thrift.oneof_ord) option for oneof members.")
 			}
 
-			g.P(fieldnum, ":\t", ccTypeName+"_"+fname, " ", fname, ",")
+			opt := "optional " // oneof is always optional
+			g.P(fieldnum, ":\t", opt, ccTypeName+"_"+fname, "\t", fname, ",")
 		}
 
 		if *field.Type == descriptor.FieldDescriptorProto_TYPE_MESSAGE {
@@ -1816,7 +1817,7 @@ func (g *Generator) generateMessage(message *Descriptor) {
 			opt = "required "
 		}
 		g.PrintComments(fmt.Sprintf("%s,%d,%d", message.path, messageFieldPath, i))
-		g.P(strconv.Itoa(int(*fieldnum)), ":\t", opt, fieldName, "\t", typename, ",")
+		g.P(strconv.Itoa(int(*fieldnum)), ":\t", opt, typename, "\t", fieldName, ",")
 		g.RecordTypeUse(field.GetTypeName())
 	}
 	if len(message.ExtensionRange) > 0 {
@@ -1864,7 +1865,7 @@ func (g *Generator) generateMessage(message *Descriptor) {
 
 			typename := g.ThriftType(message, field)
 
-			g.P(fieldnum, ":\t", *field.Name, " ", typename, ",")
+			g.P(fieldnum, ":\t", typename, " ", *field.Name, ",")
 		}
 		g.Out()
 		g.P("}")
