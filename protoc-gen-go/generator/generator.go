@@ -1174,6 +1174,10 @@ func (g *Generator) generate(file *FileDescriptor) {
 		g.generateMessage(desc)
 	}
 
+	for i, service := range file.FileDescriptorProto.Service {
+		g.generateService(file, service, i)
+	}
+
 	// Run the plugins before the imports so we know which imports are necessary.
 	g.runPlugins(file)
 
@@ -1185,6 +1189,44 @@ func (g *Generator) generate(file *FileDescriptor) {
 		return
 	}
 	g.Write(rem.Bytes())
+}
+
+// generateSignature returns the signature for a method.
+func (g *Generator) generateSignature(servName string, method *descriptor.MethodDescriptorProto) string {
+	origMethName := method.GetName()
+	methName := CamelCase(origMethName)
+
+	// We don't support streaming.
+	if method.GetServerStreaming() || method.GetClientStreaming() {
+		return ""
+	}
+
+	reqArg := g.TypeName(g.ObjectNamed(method.GetInputType()))
+	ret := g.TypeName(g.ObjectNamed(method.GetOutputType()))
+
+	return fmt.Sprintf("%s %s(1: %s in),", ret, methName, reqArg)
+}
+
+func (g *Generator) generateService(file *FileDescriptor, service *descriptor.ServiceDescriptorProto, index int) {
+	path := fmt.Sprintf("6,%d", index) // 6 means service.
+
+	origServName := service.GetName()
+	fullServName := origServName
+	if pkg := file.GetPackage(); pkg != "" {
+		fullServName = pkg + "." + fullServName
+	}
+	servName := CamelCase(origServName)
+
+	// Generate service definition
+	g.P("service ", servName, " {")
+	g.In()
+	for i, method := range service.Method {
+		g.PrintComments(fmt.Sprintf("%s,2,%d", path, i)) // 2 means method in a service.
+		g.P(g.generateSignature(servName, method))
+	}
+	g.Out()
+	g.P("}")
+	g.P()
 }
 
 // Generate the header, including package definition
