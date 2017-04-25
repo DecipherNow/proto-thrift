@@ -310,13 +310,25 @@ func (d *FileDescriptor) goPackageName() (name string, explicit bool) {
 	return baseName(d.GetName()), false
 }
 
-// thriftFileName returns the output name for the generated Go file.
-func (d *FileDescriptor) thriftFileName() string {
+// thriftIDLFileName returns the output name for the generated Thrift IDL file.
+func (d *FileDescriptor) thriftIDLFileName() string {
 	name := *d.Name
 	if ext := path.Ext(name); ext == ".proto" || ext == ".protodevel" {
 		name = name[:len(name)-len(ext)]
 	}
 	name += ".thrift"
+
+	return name
+}
+
+// thriftImplFileName returns the output name for the generated Thrift server
+// implementation Go code file.
+func (d *FileDescriptor) thriftImplFileName() string {
+	name := *d.Name
+	if ext := path.Ext(name); ext == ".proto" || ext == ".protodevel" {
+		name = name[:len(name)-len(ext)]
+	}
+	name += "_impl.go"
 
 	return name
 }
@@ -1123,6 +1135,7 @@ func (g *Generator) GenerateAllFiles() {
 		genFileMap[file] = true
 	}
 	for _, file := range g.allFiles {
+		// Generate Thrift IDL
 		g.Reset()
 		g.writeOutput = genFileMap[file]
 		g.generate(file)
@@ -1130,7 +1143,19 @@ func (g *Generator) GenerateAllFiles() {
 			continue
 		}
 		g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
-			Name:    proto.String(file.thriftFileName()),
+			Name:    proto.String(file.thriftIDLFileName()),
+			Content: proto.String(g.String()),
+		})
+
+		// Generate server implementation
+		g.Reset()
+		g.writeOutput = genFileMap[file]
+		g.generate(file)
+		if !g.writeOutput {
+			continue
+		}
+		g.Response.File = append(g.Response.File, &plugin.CodeGeneratorResponse_File{
+			Name:    proto.String(file.thriftImplFileName()),
 			Content: proto.String(g.String()),
 		})
 	}
