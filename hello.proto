@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+import "thrift.proto";
+
+// Greeting comment.
+//enum Greeting {
+//    // NONE comment.
+//    NONE = 0;
+//    // MR comment.
+//    MR = 1;
+//    // MRS comment.
+//    MRS = 2;
+//    // MISS comment.
+//    MISS = 3;
+//}
+//
+//// Hello comment.
+//message Hello {
+//    // greeting comment.
+//    Greeting greeting = 1 [(thrift.field_ord) = 1];
+//    // name comment.
+//    string name = 2       [(thrift.field_ord) = 2];
+//    // here's yet another comment
+//    oneof dunno {
+//       option (thrift.oneof_ord) = 3;
+//       string some_string = 3 [(thrift.field_ord) = 1];
+//       int32 some_int = 4     [(thrift.field_ord) = 2];
+//    }
+//}
+
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1 [(thrift.field_ord) = 1];
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1 [(thrift.field_ord) = 1];
+}
