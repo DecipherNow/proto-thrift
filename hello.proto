@@ -44,3 +44,22 @@ message HelloRequest {
 message HelloReply {
   string message = 1 [(thrift.field_ord) = 1];
 }
+
+message Foo {
+  oneof arg {
+    option (thrift.oneof_ord) = 1;
+    string name = 1 [(thrift.field_ord) = 1];
+    int32 age = 2   [(thrift.field_ord) = 2];
+    Bar bar = 3   [(thrift.field_ord) = 3];
+  }
+  string text = 4 [(thrift.field_ord) = 2];
+  int32 integer = 5 [(thrift.field_ord) = 3];
+  Bar quux = 6 [(thrift.field_ord) = 4];
+  //repeated Bar bars = 6 [(thrift.field_ord) = 4];
+  //repeated int32 ints = 7 [(thrift.field_ord) = 5];
+}
+
+message Bar {
+  string quux = 1 [(thrift.field_ord) = 1];
+  bool glob = 2 [(thrift.field_ord) = 2];
+}
