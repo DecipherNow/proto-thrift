@@ -55,6 +55,9 @@ message Foo {
   string text = 4 [(thrift.field_ord) = 2];
   int32 integer = 5 [(thrift.field_ord) = 3];
   Bar quux = 6 [(thrift.field_ord) = 4];
+  //repeated int32 ints = 7 [(thrift.field_ord) = 5];
+  repeated Bar bars = 7 [(thrift.field_ord) = 5];
+
   //repeated Bar bars = 6 [(thrift.field_ord) = 4];
   //repeated int32 ints = 7 [(thrift.field_ord) = 5];
 }
