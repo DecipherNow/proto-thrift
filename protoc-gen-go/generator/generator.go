@@ -2529,7 +2529,7 @@ func (g *Generator) generateSliceAndMapConversions() {
 		}
 
 		g.P("func ", g.marshalToThrift(nil, usedSlice), "(pbSlice []", tt, ") []", pt, " {")
-		g.P("thriftSlice := make(", pt, ", len(thriftSlice))")
+		g.P("thriftSlice := make(", tt, ", len(pbSlice))")
 		g.P("for i := 0; i < len(pbSlice); i++ {")
 		g.P("thriftSlice[i] = ", conv, "(pbSlice[i])")
 		g.P("}")
@@ -2583,15 +2583,15 @@ func (g *Generator) generateSliceAndMapConversions() {
 		if isNumeric(key) {
 			convKey = pk
 		} else {
-			convKey = g.marshalToProto(nil, key)
+			convKey = g.marshalToThrift(nil, key)
 		}
 		if isNumeric(val) {
 			convVal = pv
 		} else {
-			convVal = g.marshalToProto(nil, val)
+			convVal = g.marshalToThrift(nil, val)
 		}
 
-		g.P("func ", g.marshalToProto(nil, usedMap), "(pbMap map[", pk, "]", pv, ") map[", tv, "]", tk, " {")
+		g.P("func ", g.marshalToThrift(nil, usedMap), "(pbMap map[", pk, "]", pv, ") map[", tv, "]", tk, " {")
 		g.P("thriftMap := make(map[", tk, "]", tv, ", len(pbMap))")
 		g.P("for key, val := range pbMap {")
 		g.P("thriftMap[", convKey, "(key)] = ", convVal, "(val)")
