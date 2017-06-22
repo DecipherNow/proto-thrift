@@ -4,6 +4,8 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+cd "$DIR"
+
 INCLUDE=$(dirname "$(which protoc)")/../include
 INCLUDE=$INCLUDE:$DIR/thrift
 

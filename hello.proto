@@ -57,6 +57,8 @@ message Foo {
   Bar quux = 6 [(thrift.field_ord) = 4];
   //repeated int32 ints = 7 [(thrift.field_ord) = 5];
   repeated Bar bars = 7 [(thrift.field_ord) = 5];
+  map<int32, int32> amap = 8 [(thrift.field_ord) = 6];
+
 
   //repeated Bar bars = 6 [(thrift.field_ord) = 4];
   //repeated int32 ints = 7 [(thrift.field_ord) = 5];
