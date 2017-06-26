@@ -620,6 +620,9 @@ func (g *Generator) CommandLineParameters(parameter string) {
 		}
 	}
 
+	// Relatively sane default package name.
+	g.packageNameThrift = "thrift_pkg"
+
 	g.ImportMap = make(map[string]string)
 	pluginList := "none" // Default list of plugin names to enable (empty means all).
 	for k, v := range g.Param {
@@ -630,6 +633,8 @@ func (g *Generator) CommandLineParameters(parameter string) {
 			g.PackageImportPath = v
 		case "plugins":
 			pluginList = v
+		case "thrift_path":
+			g.PackageImportPathThrift = v
 		default:
 			if len(k) > 0 && k[0] == 'M' {
 				g.ImportMap[k[1:]] = v
@@ -786,7 +791,6 @@ func (g *Generator) SetPackageNames() {
 
 	// TODO
 	g.packageNameThrift = "hello_thrift"
-	g.PackageImportPathThrift = "thrift-playground/thrift-build/hello_thrift"
 
 	// Register the support package names. They might collide with the
 	// name of a package we import.
@@ -2529,7 +2533,7 @@ func (g *Generator) generateSliceAndMapConversions() {
 		}
 
 		g.P("func ", g.marshalToThrift(nil, usedSlice), "(pbSlice []", tt, ") []", pt, " {")
-		g.P("thriftSlice := make(", tt, ", len(pbSlice))")
+		g.P("thriftSlice := make([]", tt, ", len(pbSlice))")
 		g.P("for i := 0; i < len(pbSlice); i++ {")
 		g.P("thriftSlice[i] = ", conv, "(pbSlice[i])")
 		g.P("}")
@@ -2693,6 +2697,9 @@ func (g *Generator) generateMessage(message *Descriptor) {
 				keyType, _ := g.GoType(d, keyField)
 				valType, _ := g.GoType(d, valField)
 
+				thriftKeyType := g.ThriftType(d, keyField)
+				thriftValType := g.ThriftType(d, valField)
+
 				// We don't use stars, except for message-typed values.
 				// Message and enum types are the only two possibly foreign types used in maps,
 				// so record their use. They are not permitted as map keys.
@@ -2707,7 +2714,7 @@ func (g *Generator) generateMessage(message *Descriptor) {
 					valType = strings.TrimPrefix(valType, "*")
 				}
 
-				typename = fmt.Sprintf("map<%s,%s>", keyType, valType)
+				typename = fmt.Sprintf("map<%s,%s>", thriftKeyType, thriftValType)
 				mapFieldTypes[field] = typename // record for the getter generation
 			}
 		}

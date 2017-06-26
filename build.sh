@@ -9,9 +9,11 @@ cd "$DIR"
 INCLUDE=$(dirname "$(which protoc)")/../include
 INCLUDE=$INCLUDE:$DIR/thrift
 
+THRIFT_PATH=thrift-playground/thrift-build/hello_thrift
+
 protoc --proto_path=./ --proto_path=$INCLUDE --go_out=. thrift/*.proto
 sed -i "thrift/thrift.pb.go" -e 's|"google/protobuf"|"github.com/golang/protobuf/protoc-gen-go/descriptor"|'
 go build -o gen-go ./protoc-gen-go
-protoc --proto_path=./ --proto_path=$INCLUDE --plugin=protoc-gen-custom=gen-go --custom_out=./build hello.proto
+protoc --proto_path=./ --proto_path=$INCLUDE --plugin=protoc-gen-custom=gen-go --custom_out=thrift_path=$THRIFT_PATH:./build hello.proto
 
 # build/hello.thrift
