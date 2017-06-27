@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "thrift.proto";
+
+option go_package = "github.com/golang/protobuf/examples;hello";
+
+option (thrift.go_namespace) = "hello";
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  oneof arg {
+    option (thrift.oneof_ord) = 1;
+    string name = 1 [(thrift.field_ord) = 1];
+    int32 age = 2   [(thrift.field_ord) = 2];
+    HelloReply blip = 3 [(thrift.field_ord) = 3];
+  }
+
+  repeated int32 ints = 4 [(thrift.field_ord) = 2];
+  map<int32, int32> amap = 5 [(thrift.field_ord) = 3];
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1 [(thrift.field_ord) = 1];
+  int32 integer = 2 [(thrift.field_ord) = 2];
+  bool bloop = 3 [(thrift.field_ord) = 3];
+}

@@ -789,15 +789,13 @@ func (g *Generator) SetPackageNames() {
 
 	g.packageName = RegisterUniquePackageName(pkg, g.genFiles[0])
 
-	// TODO
-	g.packageNameThrift = "hello_thrift"
-
 	// Register the support package names. They might collide with the
 	// name of a package we import.
 	g.Pkg = map[string]string{
-		"fmt":   RegisterUniquePackageName("fmt", nil),
-		"math":  RegisterUniquePackageName("math", nil),
-		"proto": RegisterUniquePackageName("proto", nil),
+		"fmt":     RegisterUniquePackageName("fmt", nil),
+		"math":    RegisterUniquePackageName("math", nil),
+		"proto":   RegisterUniquePackageName("proto", nil),
+		"context": RegisterUniquePackageName("context", nil),
 	}
 
 AllFiles:
@@ -1337,6 +1335,8 @@ func (g *Generator) generateService(file *FileDescriptor, service *descriptor.Se
 }
 
 func (g *Generator) generateServiceImpl(file *FileDescriptor, service *descriptor.ServiceDescriptorProto, index int) {
+	context_name := g.Pkg["context"]
+
 	origServName := service.GetName()
 	fullServName := origServName
 	if pkg := file.GetPackage(); pkg != "" {
@@ -1360,7 +1360,7 @@ func (g *Generator) generateServiceImpl(file *FileDescriptor, service *descripto
 		g.P("func (self *", servName, "Impl) ", method.GetName(), "(in ", inputName, ") (", outputName, ", error) {")
 		g.In()
 		g.P("req := conv_", mangleTypename(inputName), "_to_pb(in)")
-		g.P("resp, err := self.Client.", method.GetName(), "(context.Background(), req)")
+		g.P("resp, err := self.Client.", method.GetName(), "(", context_name, ".Background(), req)")
 		g.P("return conv_", mangleTypename(outputName), "_to_thrift(resp), err")
 		g.Out()
 		g.P("}")
@@ -1413,7 +1413,13 @@ func (g *Generator) generateHeader() {
 
 	// TODO: probably want some directive in the original proto descriptor
 	// to provide namespace settings.
-	g.P("namespace * ", name)
+	go_namespace := name
+	if opt, _ := extractGoNamespace(g.file.FileDescriptorProto); opt != nil {
+		go_namespace = *opt
+	}
+
+	g.P("namespace go ", go_namespace)
+
 	g.P()
 }
 
@@ -1466,7 +1472,12 @@ func (g *Generator) generateHeaderImpl() {
 	// to provide namespace settings.
 	g.P("package ", name)
 	g.P()
-	g.P("import ", g.packageNameThrift, "\"", g.PackageImportPathThrift, "\"")
+	g.P("import ", g.packageNameThrift, " \"", g.PackageImportPathThrift, "\"")
+	g.P("import " + g.Pkg["context"] + ` "context"`)
+	g.P()
+
+	g.P("// Reference imports to suppress errors if they are not otherwise used.")
+	g.P("var _ = ", g.Pkg["context"], ".Background")
 	g.P()
 }
 
@@ -1961,6 +1972,24 @@ func extractThriftOneofOrd(oneof *descriptor.OneofDescriptorProto) (*int32, erro
 		return nil, err
 	}
 	opts, ok := ext.(*int32)
+	if !ok {
+		return nil, fmt.Errorf("extension is %T; want an *int32", ext)
+	}
+	return opts, nil
+}
+
+func extractGoNamespace(file *descriptor.FileDescriptorProto) (*string, error) {
+	if file.Options == nil {
+		return nil, nil
+	}
+	if !proto.HasExtension(file.Options, thrift.E_GoNamespace) {
+		return nil, nil
+	}
+	ext, err := proto.GetExtension(file.Options, thrift.E_GoNamespace)
+	if err != nil {
+		return nil, err
+	}
+	opts, ok := ext.(*string)
 	if !ok {
 		return nil, fmt.Errorf("extension is %T; want an *int32", ext)
 	}

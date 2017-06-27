@@ -14,3 +14,6 @@ _test
 _testmain.go
 protoc-gen-go/testdata/multi/*.pb.go
 _conformance/_conformance
+build
+gen-thrift
+bin
