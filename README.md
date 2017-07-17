@@ -2,7 +2,8 @@
 
 Google's data interchange format.
 Copyright 2010 The Go Authors.
-https://github.com/golang/protobuf
+Copyright 2017 Decipher Technology Studios.
+https://github.com/deciphernow/proto-thrift
 
 This package and the code it generates requires at least Go 1.4.
 

@@ -53,9 +53,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	"github.com/deciphernow/proto-thrift/thrift"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
-	"github.com/golang/protobuf/thrift"
 )
 
 // generatedCodeVersion indicates a version of the generated code.
