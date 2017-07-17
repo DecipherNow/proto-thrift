@@ -53,7 +53,7 @@ import (
 	"os"
 
 	"github.com/deciphernow/proto-thrift/proto"
-	"github.com/deciphernow/proto-thrift/protoc-gen-go/generator"
+	"github.com/deciphernow/proto-thrift/protoc-gen-thrift/generator"
 )
 
 func main() {

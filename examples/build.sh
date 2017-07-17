@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR"
 
 # Include paths for requisite *.proto files.
-GENHOME=$GOPATH/src/github.com/golang/protobuf
+GENHOME=$GOPATH/src/github.com/deciphernow/proto-thrift
 INCLUDE="$(dirname "$(which protoc)")/../include"
 INCLUDE="$INCLUDE:$GENHOME/thrift"
 
@@ -23,7 +23,7 @@ echo "Generating Thrift IDL & proxy . . ."
 protoc \
   --proto_path=./ \
   --proto_path=$INCLUDE \
-  --plugin=protoc-gen-custom=$GENHOME/gen-thrift \
+  --plugin=protoc-gen-custom=protoc-gen-thrift \
   --custom_out=thrift_path=$THRIFT_PATH:. \
   hello.proto
 
