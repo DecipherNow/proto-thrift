@@ -40,7 +40,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/deciphernow/proto-thrift/protoc-gen-go/generator"
+	"github.com/deciphernow/proto-thrift/protoc-gen-thrift/generator"
 	pb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 )
 
